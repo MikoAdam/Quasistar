@@ -34,18 +34,20 @@ object GameLogic {
             1 to -1, 1 to 0, 1 to 1      // Downward directions
         )
 
+        val movingPlayer = board[row][col].player
+
         for ((dr, dc) in directions) {
             var newRow = row + dr
             var newCol = col + dc
             var jumpedOverPiece = false
 
             while (newRow in 0 until 12 && newCol in 0 until 8) {
-                if (board[newRow][newCol].player == Player.NONE) {
+                if (board[newRow][newCol].player == Player.NONE || isEnemyHomeZone(movingPlayer, newRow)) {
                     if (jumpedOverPiece) {
                         // If we jumped over at least one piece diagonally, this is a valid move
                         moves.add(newRow to newCol)
                     } else {
-                        // Normal move to an adjacent empty cell
+                        // Normal move to an adjacent empty cell or into enemy home zone
                         moves.add(newRow to newCol)
                     }
                     break
@@ -63,10 +65,24 @@ object GameLogic {
         return moves
     }
 
+    private fun isEnemyHomeZone(player: Player, row: Int): Boolean {
+        return (player == Player.ONE && row in 0..1) || (player == Player.TWO && row in 10..11)
+    }
+
     fun movePiece(board: Array<Array<CellState>>, from: Pair<Int, Int>, to: Pair<Int, Int>): Array<Array<CellState>> {
         val newBoard = board.map { it.copyOf() }.toTypedArray()
-        newBoard[to.first][to.second] = newBoard[to.first][to.second].copy(player = newBoard[from.first][from.second].player)
-        newBoard[from.first][from.second] = newBoard[from.first][from.second].copy(player = Player.NONE)
+        val movingPlayer = newBoard[from.first][from.second].player
+
+        if (isEnemyHomeZone(movingPlayer, to.first)) {
+            // Always allow the move into the enemy's home zone, and remove any enemy piece there
+            newBoard[to.first][to.second] = newBoard[to.first][to.second].copy(player = movingPlayer)
+            newBoard[from.first][from.second] = newBoard[from.first][from.second].copy(player = Player.NONE)
+        } else {
+            // Normal move or into the middle protected zone
+            newBoard[to.first][to.second] = newBoard[to.first][to.second].copy(player = movingPlayer)
+            newBoard[from.first][from.second] = newBoard[from.first][from.second].copy(player = Player.NONE)
+        }
+
         return newBoard
     }
 
