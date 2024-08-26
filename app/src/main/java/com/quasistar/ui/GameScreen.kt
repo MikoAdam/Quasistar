@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.quasistar.logic.GameLogic
+import com.quasistar.logic.GameStateManager
 import com.quasistar.model.CellState
 import com.quasistar.model.Player
 import com.quasistar.settings.SettingsManager
@@ -52,14 +53,18 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun GameScreen(onWin: (Player) -> Unit, onBack: () -> Unit) {
-    var board by remember { mutableStateOf(GameLogic.initialBoard()) }
-    var currentPlayer by remember { mutableStateOf(Player.ONE) }
+    val context = LocalContext.current
+    val savedGameState = GameStateManager.loadGameState(context)
+
+    var board by remember { mutableStateOf(savedGameState?.first ?: GameLogic.initialBoard()) }
+    var currentPlayer by remember { mutableStateOf(savedGameState?.second ?: Player.ONE) }
+    var gameOfLifeSteps by remember { mutableStateOf(savedGameState?.third?.toMutableList() ?: MutableList(6) { false }) }
+
     var selectedPiece by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     var possibleMoves by remember { mutableStateOf(listOf<Pair<Int, Int>>()) }
     var moveCount by remember { mutableIntStateOf(0) }
-    var gameOfLifeSteps by remember { mutableStateOf(MutableList(6) { false }) }
     var showExitDialog by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
     val scope = rememberCoroutineScope()
 
     var showLabels by remember { mutableStateOf(false) }
@@ -116,7 +121,7 @@ fun GameScreen(onWin: (Player) -> Unit, onBack: () -> Unit) {
                 .padding(8.dp),
             horizontalArrangement = Arrangement.Center
         ) {
-            gameOfLifeSteps.forEach { isGameOfLifeStep ->
+            gameOfLifeSteps.forEachIndexed { index, isGameOfLifeStep ->
                 Box(
                     modifier = Modifier
                         .size(24.dp)
@@ -206,6 +211,7 @@ fun GameScreen(onWin: (Player) -> Unit, onBack: () -> Unit) {
                                         }
                                         GameLogic.updateSteps(gameOfLifeSteps)
                                         GameLogic.checkWinCondition(board, winningCondition, onWin)
+                                        GameStateManager.saveGameState(context, board, currentPlayer, gameOfLifeSteps)
                                     } else if (selectedPiece != null && board[row][col].player == currentPlayer) {
                                         selectedPiece = row to col
                                         possibleMoves = GameLogic.calculatePossibleMoves(board, row, col)
