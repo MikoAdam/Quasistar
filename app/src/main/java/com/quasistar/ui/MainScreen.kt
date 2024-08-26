@@ -20,6 +20,7 @@ fun MainScreen() {
     var currentScreen by remember { mutableStateOf<Screen?>(null) }
     val context = LocalContext.current
     var showContinueDialog by remember { mutableStateOf(false) }
+    var showComingSoonDialog by remember { mutableStateOf(false) }
 
     // Start with the SplashScreen
     if (currentScreen == null) {
@@ -56,16 +57,34 @@ fun MainScreen() {
                     } else {
                         currentScreen = Screen.Game // No saved game, start a new game directly
                     }
+                } else if (showComingSoonDialog) {
+                    // Show "Coming Soon" dialog
+                    AlertDialog(
+                        onDismissRequest = { showComingSoonDialog = false },
+                        title = { Text("Coming Soon!") },
+                        text = { Text("Online multiplayer will be available in future updates.") },
+                        confirmButton = {
+                            Button(onClick = { showComingSoonDialog = false }) {
+                                Text("OK")
+                            }
+                        }
+                    )
                 } else {
                     MenuUI.MainMenuScreen(
-                        onStartGame = {
-                            // Check for saved game only when Play is clicked
+                        onStartLocalGame = {
+                            // Check for saved game only when Local Multiplayer is clicked
                             val savedGameState = GameStateManager.loadGameState(context)
                             if (savedGameState != null) {
                                 showContinueDialog = true
                             } else {
                                 currentScreen = Screen.Game // Start a new game directly
                             }
+                        },
+                        onStartAIGame = {
+                            currentScreen = Screen.Game // Placeholder for AI implementation
+                        },
+                        onStartOnlineGame = {
+                            showComingSoonDialog = true // Show the "Coming Soon" dialog
                         },
                         onViewRules = { currentScreen = Screen.Rules },
                         onAboutUs = { /* Navigate to About Us screen */ },

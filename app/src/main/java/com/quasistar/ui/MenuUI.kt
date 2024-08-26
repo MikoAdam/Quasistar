@@ -2,8 +2,16 @@ package com.quasistar.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -18,7 +26,9 @@ import androidx.compose.ui.unit.sp
 object MenuUI {
     @Composable
     fun MainMenuScreen(
-        onStartGame: () -> Unit,
+        onStartLocalGame: () -> Unit,
+        onStartAIGame: () -> Unit,
+        onStartOnlineGame: () -> Unit,
         onViewRules: () -> Unit,
         onAboutUs: () -> Unit,
         onSettings: () -> Unit
@@ -45,27 +55,35 @@ object MenuUI {
             )
             Spacer(modifier = Modifier.height(32.dp))
             Button(
-                onClick = onStartGame,
+                onClick = onStartLocalGame,
                 modifier = Modifier.fillMaxWidth().padding(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF017374))
             ) {
-                Text("Start Game", fontSize = 18.sp, color = Color.White)
+                Text("Local Multiplayer", fontSize = 18.sp, color = Color.White)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onStartAIGame,
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF6A83EA))
+            ) {
+                Text("Single Player (AI)", fontSize = 18.sp, color = Color.White)
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = onStartOnlineGame,
+                modifier = Modifier.fillMaxWidth().padding(8.dp),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6F61))
+            ) {
+                Text("Online (Coming Soon)", fontSize = 18.sp, color = Color.White)
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
                 onClick = onViewRules,
                 modifier = Modifier.fillMaxWidth().padding(8.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF6F61))
-            ) {
-                Text("Rules", fontSize = 18.sp, color = Color.White)
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = onAboutUs,
-                modifier = Modifier.fillMaxWidth().padding(8.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFEABF6A))
             ) {
-                Text("About Us", fontSize = 18.sp, color = Color.White)
+                Text("Rules", fontSize = 18.sp, color = Color.White)
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
