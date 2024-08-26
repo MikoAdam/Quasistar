@@ -29,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +37,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -57,12 +57,12 @@ fun GameScreen(onWin: (Player) -> Unit, onBack: () -> Unit) {
     var selectedPiece by remember { mutableStateOf<Pair<Int, Int>?>(null) }
     var possibleMoves by remember { mutableStateOf(listOf<Pair<Int, Int>>()) }
     var moveCount by remember { mutableIntStateOf(0) }
-    val gameOfLifeProbability = remember { mutableFloatStateOf(0.1f) }
+    var gameOfLifeSteps by remember { mutableStateOf(MutableList(6) { false }) }
     var showExitDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 
-    var showLabels by remember { mutableStateOf(false) } // Default to false to avoid flashing
+    var showLabels by remember { mutableStateOf(false) }
     var winningCondition by remember { mutableIntStateOf(1) }
 
     LaunchedEffect(Unit) {
@@ -109,6 +109,28 @@ fun GameScreen(onWin: (Player) -> Unit, onBack: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        // Display next six predicted steps with color coding
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            gameOfLifeSteps.forEach { isGameOfLifeStep ->
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .shadow(4.dp, CircleShape)
+                        .background(
+                            color = if (isGameOfLifeStep) Color.Red else Color.Green,
+                            shape = CircleShape
+                        )
+                        .padding(4.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+        }
+
         Box(
             modifier = Modifier
                 .weight(1f)
@@ -174,12 +196,15 @@ fun GameScreen(onWin: (Player) -> Unit, onBack: () -> Unit) {
                                         selectedPiece = null
                                         possibleMoves = listOf()
                                         moveCount++
-                                        GameLogic.updateGameOfLifeProbability(
-                                            context,
-                                            board,
-                                            moveCount,
-                                            gameOfLifeProbability.floatValue
-                                        )
+                                        if (GameLogic.updateGameOfLifeProbability(
+                                                context,
+                                                board,
+                                                moveCount,
+                                                gameOfLifeSteps
+                                            )) {
+                                            gameOfLifeSteps[0] = false // Reset the first step to safe after GoL
+                                        }
+                                        GameLogic.updateSteps(gameOfLifeSteps)
                                         GameLogic.checkWinCondition(board, winningCondition, onWin)
                                     } else if (selectedPiece != null && board[row][col].player == currentPlayer) {
                                         selectedPiece = row to col

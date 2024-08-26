@@ -10,6 +10,12 @@ import kotlin.random.Random
 
 object GameLogic {
 
+    private const val INITIAL_PROBABILITY = 0.25f
+    private const val PROBABILITY_INCREMENT = 0.1f
+    private const val SAFE_STEP_COUNT = 6
+
+    private var currentProbability = INITIAL_PROBABILITY
+
     fun initialBoard(): Array<Array<CellState>> {
         val board = Array(12) { row ->
             Array(8) { col ->
@@ -44,20 +50,16 @@ object GameLogic {
             while (newRow in 0 until 12 && newCol in 0 until 8) {
                 if (board[newRow][newCol].player == Player.NONE || isEnemyHomeZone(movingPlayer, newRow)) {
                     if (jumpedOverPiece) {
-                        // If we jumped over at least one piece diagonally, this is a valid move
                         moves.add(newRow to newCol)
                     } else {
-                        // Normal move to an adjacent empty cell or into enemy home zone
                         moves.add(newRow to newCol)
                     }
                     break
                 } else if (dr != 0 && dc != 0) {
-                    // If moving diagonally and we've encountered a piece, attempt to jump
                     jumpedOverPiece = true
                     newRow += dr
                     newCol += dc
                 } else {
-                    // If moving horizontally or vertically and encounter a piece, stop
                     break
                 }
             }
@@ -74,11 +76,9 @@ object GameLogic {
         val movingPlayer = newBoard[from.first][from.second].player
 
         if (isEnemyHomeZone(movingPlayer, to.first)) {
-            // Always allow the move into the enemy's home zone, and remove any enemy piece there
             newBoard[to.first][to.second] = newBoard[to.first][to.second].copy(player = movingPlayer)
             newBoard[from.first][from.second] = newBoard[from.first][from.second].copy(player = Player.NONE)
         } else {
-            // Normal move or into the middle protected zone
             newBoard[to.first][to.second] = newBoard[to.first][to.second].copy(player = movingPlayer)
             newBoard[from.first][from.second] = newBoard[from.first][from.second].copy(player = Player.NONE)
         }
@@ -86,21 +86,33 @@ object GameLogic {
         return newBoard
     }
 
+    private fun generateNextStep(): Boolean {
+        val isGameOfLifeStep = Random.nextFloat() < currentProbability
+        if (isGameOfLifeStep) {
+            currentProbability = INITIAL_PROBABILITY
+        } else {
+            currentProbability += PROBABILITY_INCREMENT
+        }
+        return isGameOfLifeStep
+    }
+
+    fun updateSteps(steps: MutableList<Boolean>) {
+        steps.removeAt(0)
+        steps.add(generateNextStep())
+    }
+
     fun updateGameOfLifeProbability(
         context: Context,
         board: Array<Array<CellState>>,
         moveCount: Int,
-        gameOfLifeProbability: Float
-    ): Float {
-        var updatedProbability = gameOfLifeProbability
-        if (moveCount >= 6 && Random.nextFloat() < updatedProbability) {
+        gameOfLifeSteps: MutableList<Boolean>
+    ): Boolean {
+        if (gameOfLifeSteps[0]) {
             applyGameOfLifeStep(board)
-            updatedProbability = 0.1f
             triggerVibration(context)
-        } else if (moveCount >= 6) {
-            updatedProbability += 0.02f
+            return true
         }
-        return updatedProbability
+        return false
     }
 
     private fun applyGameOfLifeStep(board: Array<Array<CellState>>) {
