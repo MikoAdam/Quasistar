@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "871547905100",
+    "project_id": "quasistr-44469",
+    "storage_bucket": "quasistr-44469.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871547905100:android:930cbc8bbeef48e55140e9",
+        "android_client_info": {
+          "package_name": "com.quasistar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGR18HRGcOMVUsFephxd48q6EpdQunot4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:871547905100:android:b72289e2388b76fc5140e9",
+        "android_client_info": {
+          "package_name": "com.quasistr"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGR18HRGcOMVUsFephxd48q6EpdQunot4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
