@@ -26,7 +26,7 @@ We take your privacy seriously. By using this app, we collect no personal data o
 
 This policy applies only to the Quasistr game, and we reserve the right to modify this policy if the app evolves or includes new features that require additional considerations.
 
-For further details, you can check our [Data Protection Policy](https://github.com/MikoAdam/Quasistar/data-policy).
+For further details, you can check our [Data Protection Policy](https://github.com/MikoAdam/Quasistar/blob/master/data-policy.md).
 
 ---
 
