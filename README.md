@@ -54,6 +54,7 @@ This game is open source! Feel free to review the code, make suggestions, and im
 
 Quasistr is distributed under the **Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License**. This means:
 - You are free to share and adapt the code as long as you provide attribution, use it for non-commercial purposes, and share any modifications under the same license.
+- This license applies only to the original code created for Quasistr. Third-party libraries, such as Firebase, are governed by their respective licenses.
 - For commercial use or any other inquiries, please reach out to me via LinkedIn.
 
 ---
